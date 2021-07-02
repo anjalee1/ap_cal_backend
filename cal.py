@@ -1,21 +1,33 @@
-import requests
-
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
-# operator=input('''Type one of the opertaors from these options:
-#                  + : For addition
-#                  - : For substraction
-#                  * : For multiplication
-#                  / : For Divison
-#
-#                  Type here: ''')
-#
-# num1 =int(input('Enter First Number:'))
-# num2=int(input('Enter Second Number:'))
-# data={'operator':'','num1':'','num2':''}
-# data['operator']=operator
-# data['num1']=num1
-# data['num2']=num2
 
-r2=requests.get(url='http://localhost:8080/')
-# if r1[operator]
-# # r1=requests.post(url='http://localhost:8080/',data=d)
+Result={}
+class CalHandler(BaseHTTPRequestHandler):
+      def do_POST(self):
+        length = int(self.headers['Content-Length'])
+        content = self.rfile.read(length)
+        print(content)
+        values = json.loads(content)
+
+
+        if values['operator']=='+':
+            res=values['number1']+values['number2']
+            Result['result'] = res
+
+        elif values['operator']=="-":
+            res=values['number1']-values['number2']
+            Result['result'] = res
+        elif values['operator']=="*":
+            res=values['number1']*values['number2']
+            Result['result'] = res
+        elif values['operator']=="/" :
+            res = values['number1'] / values['number2']
+            Result['result'] = res
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-type', 'text/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(Result).encode())
+
+server = HTTPServer(('localhost', 8080), CalHandler)
+server.serve_forever()
